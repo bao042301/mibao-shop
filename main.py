@@ -8,7 +8,7 @@ st.set_page_config(page_title="米寶漢方｜植感日常選物", layout="cente
 
 st.markdown("""
     <style>
-    /* 1. 品牌字體與顏色 (避開系統圖示，解決 _arrow_right 亂碼) */
+    /* 1. 品牌字體與顏色 */
     p, label, h1, h2, h3, h4, h5, h6, li, div[data-testid="stMarkdownContainer"] { 
         font-family: 'Noto Sans TC', sans-serif !important; 
         color: #4A4E31 !important; 
@@ -23,7 +23,7 @@ st.markdown("""
     /* 3. Logo 尺寸 */
     [data-testid="stImage"] img { max-height: 50px !important; width: auto !important; margin: 0 auto !important; display: block; }
     
-    /* 4. 🚀 徹底解決深色模式黑底 (輸入框與加減按鈕) */
+    /* 4. 🚀 徹底解決深色模式黑底 (輸入框、加減按鈕、Checkbox黑塊) */
     div[data-baseweb="input"], div[data-baseweb="base-input"] { 
         background-color: #FFFFFF !important; 
         border: 1.5px solid #E9EDC9 !important; 
@@ -34,11 +34,13 @@ st.markdown("""
         color: #4A4E31 !important; 
         -webkit-text-fill-color: #4A4E31 !important; 
     }
-    /* 將數量選擇器的 + 和 - 按鈕漆上淡綠色，消滅黑底 */
     [data-testid="stNumberInput"] button {
         background-color: #F1F4E8 !important;
         color: #4A4E31 !important;
         border: none !important;
+    }
+    [data-testid="stCheckbox"] div[data-baseweb="checkbox"] div {
+        background-color: transparent !important;
     }
 
     /* 5. LINE 原生跳轉按鈕樣式鎖定 */
@@ -48,8 +50,16 @@ st.markdown("""
     }
     [data-testid="stLinkButton"] a * { color: #FFFFFF !important; font-size: 1.05rem !important; font-weight: 900 !important; }
 
-    /* 6. 程式碼複製框防黑底 */
-    [data-testid="stCodeBlock"], [data-testid="stCodeBlock"] > div, pre, code { background-color: #F8F9F1 !important; border: 1px solid #E9EDC9 !important; border-radius: 12px !important; }
+    /* 6. 程式碼複製框防黑底與「隱形字體」修復 */
+    [data-testid="stCodeBlock"], [data-testid="stCodeBlock"] > div, pre, code { 
+        background-color: #F8F9F1 !important; 
+        border: 1px solid #E9EDC9 !important; 
+        border-radius: 12px !important; 
+    }
+    [data-testid="stCodeBlock"] code span {
+        color: #4A4E31 !important; 
+        font-weight: bold !important;
+    }
     [data-testid="stCodeBlock"] button { opacity: 1 !important; background-color: rgba(233, 237, 201, 1) !important; scale: 0.8; }
 
     /* 7. 頁尾固定 */
@@ -96,17 +106,22 @@ with st.expander("點擊展開湯包品項 ($150 / $250)"):
             order_summary.append(f"• {s}燉湯包 x {qty}")
             total_price += 250 * qty
 
-# --- 3. 日常真空調理區 ---
-st.markdown('<div class="section-title">🛍️ 日常真空調理包 ($90/包)</div>', unsafe_allow_html=True)
+# --- 3. 日常真空調理區 (新增八珍) ---
+st.markdown('<div class="section-title">🛍️ 日常真空調理包</div>', unsafe_allow_html=True)
 for d in ["杜仲茶 (真空包)", "四物茶 (真空包)"]:
-    d_qty = st.number_input(f"{d}", min_value=0, step=1, key=d)
+    d_qty = st.number_input(f"{d} $90", min_value=0, step=1, key=d)
     if d_qty > 0:
         order_summary.append(f"• {d} x {d_qty}")
         total_price += 90 * d_qty
 
+bz_qty = st.number_input("八珍茶 (真空包) $95", min_value=0, step=1, key="八珍茶")
+if bz_qty > 0:
+    order_summary.append(f"• 八珍茶(真空包) x {bz_qty}")
+    total_price += 95 * bz_qty
+
 # --- 4. 漢方代餐 ---
-st.markdown('<div class="section-title">🌾 漢方代餐包 ($300/包)</div>', unsafe_allow_html=True)
-m_qty = st.number_input("32味五穀養生餐", min_value=0, step=1)
+st.markdown('<div class="section-title">🌾 漢方代餐包</div>', unsafe_allow_html=True)
+m_qty = st.number_input("32味五穀養生餐 $300", min_value=0, step=1)
 if m_qty > 0:
     order_summary.append(f"• 32味五穀養生餐 x {m_qty}")
     total_price += 300 * m_qty
