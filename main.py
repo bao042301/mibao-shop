@@ -1,115 +1,86 @@
-
 import streamlit as st
 import os
 
 # ==========================================
-# 第一步：環境設定與 CSS 視覺靈魂 (終極防深色模式)
+# 第一步：環境設定與絕對領域 CSS 視覺
 # ==========================================
 st.set_page_config(page_title="米寶漢方｜植感日常選物", layout="centered")
 
 st.markdown("""
     <style>
-    /* 1. 品牌字體與全局高對比度設定 */
-    /* 在 OS 開啟深色模式時，這段設定會強制文字保持高Legibility */
-    p, label, h1, h2, h3, h4, h5, h6, li, div[data-testid="stMarkdownContainer"], span[data-testid="stMarkdownContainer"] p { 
+    /* 1. 強制全站淺色底與深綠字 (對抗任何模式切換) */
+    .stApp, header { background-color: #FDFBF7 !important; }
+    html, body, p, span, h1, h2, h3, h4, h5, h6, label, div, li { 
         font-family: 'Noto Sans TC', sans-serif !important; 
-        color: #FFFFFF !important; /* 全局設為白色，與深色背景形成強烈對比 */
-        -webkit-text-fill-color: #FFFFFF !important; /* 強制文字填充顏色 */
-        text-shadow: none !important;
+        color: #4A4E31 !important; 
     }
-    
-    /* 2. 標題與區塊設計 */
-    /* 讓區塊標題（淡綠底）在黑化背景中脫穎而出 */
-    .section-title { 
-        background-color: #E9EDC9 !important; /* 淡綠色背景保持 */
-        padding: 10px; 
-        border-radius: 8px; 
-        text-align: center; 
-        font-weight: bold; 
-        margin: 20px 0 10px; 
-        font-size: 1.05rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    /* 區塊標題內的文字必須設為深綠色，與淡綠底對比 */
-    .section-title p, .section-title h3 {
-        color: #4A4E31 !important;
-        -webkit-text-fill-color: #4A4E31 !important;
-    }
+    .block-container { padding-top: 1.5rem !important; padding-bottom: 90px !important; }
 
+    /* 2. 標題與區塊設計 */
+    h3 { font-size: 1.15rem !important; font-weight: 700 !important; margin: 20px 0 10px !important; text-align: center !important; color: #7A8450 !important; letter-spacing: 1px; }
+    .section-title { background-color: #E9EDC9 !important; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin: 20px 0 10px; font-size: 1.05rem;}
+    .section-title * { color: #4A4E31 !important; -webkit-text-fill-color: #4A4E31 !important; }
+    
     /* 3. Logo 尺寸 */
     [data-testid="stImage"] img { max-height: 50px !important; width: auto !important; margin: 0 auto !important; display: block; }
     
-    /* 4. 🚀 🚀 🚀 重點：徹底修復 NumberInput 黑底隱形按鈕與字體 */
-    /* 將數量輸入框的背景設為深綠色，邊框淡綠色，文字白色 */
-    [data-testid="stNumberInput"] div[data-baseweb="input"] {
-        background-color: #7A8450 !important; /* 中等橄欖綠 */
-        border: 1.5px solid #E9EDC9 !important; /* 淡綠色邊框 */
-        border-radius: 8px !important;
+    /* 4. 折疊選單 (Expander) 強制明亮化 */
+    [data-testid="stExpander"] details { border: 1px solid #E9EDC9 !important; border-radius: 8px !important; background-color: #FFFFFF !important; }
+    [data-testid="stExpander"] summary { background-color: #F8F9F1 !important; border-radius: 8px !important; }
+    [data-testid="stExpander"] summary * { color: #7A8450 !important; font-weight: bold !important; -webkit-text-fill-color: #7A8450 !important; }
+
+    /* 5. 輸入框與按鈕強制白底綠字 */
+    div[data-baseweb="input"], div[data-baseweb="base-input"] { 
+        background-color: #FFFFFF !important; 
+        border: 1.5px solid #E9EDC9 !important; 
+        border-radius: 8px !important; 
     }
-    [data-testid="stNumberInput"] input {
-        color: #FFFFFF !important; /* 強制白色文字 */
-        -webkit-text-fill-color: #FFFFFF !important;
+    input { 
+        background-color: #FFFFFF !important; 
+        color: #4A4E31 !important; 
+        -webkit-text-fill-color: #4A4E31 !important; 
     }
-    /* 將加減按鈕漆上淡綠色圖示，消滅黑底 */
+    input::placeholder { color: rgba(74, 78, 49, 0.5) !important; -webkit-text-fill-color: rgba(74, 78, 49, 0.5) !important; }
     [data-testid="stNumberInput"] button {
-        background-color: transparent !important; /* 按鈕背景透明 */
-        color: #E9EDC9 !important; /* 按鈕圖示 (+, -) 設為淡綠色，最高 LEGIBILITY */
-        -webkit-text-fill-color: #E9EDC9 !important;
-        border: 1px solid rgba(233, 237, 201, 0.3) !important;
+        background-color: #F1F4E8 !important;
+        color: #4A4E31 !important;
+        border: none !important;
     }
-    
-    /* 其他輸入框 (TextInput: 姓名、電話、地址) 背景與文字 */
-    [data-testid="stTextInput"] div[data-baseweb="input"] {
-        background-color: #7A8450 !important;
-        border: 1.5px solid #E9EDC9 !important;
-        border-radius: 8px !important;
-    }
-    [data-testid="stTextInput"] input {
-        color: #FFFFFF !important;
-        -webkit-text-fill-color: #FFFFFF !important;
-    }
-    [data-testid="stTextInput"] input::placeholder {
-        color: rgba(233, 237, 201, 0.6) !important; /* 淡綠色佔位符 */
-    }
+    [data-testid="stNumberInput"] button * { color: #4A4E31 !important; fill: #4A4E31 !important; }
 
-    /* Checkbox 文字與勾選框 */
-    [data-testid="stCheckbox"] label div div[role="checkbox"] {
-        border-color: #E9EDC9 !important;
-        background-color: #7A8450 !important;
-    }
+    /* Checkbox 防黑底 */
+    [data-testid="stCheckbox"] label > div:first-child { background-color: #FFFFFF !important; border: 2px solid #7A8450 !important; }
 
-    /* 5. LINE 原生跳轉按鈕樣式鎖定 */
+    /* 6. LINE 原生跳轉按鈕樣式鎖定 */
     [data-testid="stLinkButton"] a {
         width: 100% !important; background-color: #06C755 !important; border-radius: 15px !important; height: 3.2em !important; 
         display: flex !important; justify-content: center !important; align-items: center !important; text-decoration: none !important;
     }
-    [data-testid="stLinkButton"] a * { color: #FFFFFF !important; font-size: 1.05rem !important; font-weight: 900 !important; }
+    [data-testid="stLinkButton"] a * { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-size: 1.05rem !important; font-weight: 900 !important; }
 
-    /* 6. 🚀 🚀 🚀 終極修復「黑色複製框」與「隱形文字」 */
-    /* 當 OS 變黑時，我們讓這個複製框也變成高對比度的深橄欖綠底，文字強制為白色 */
-    [data-testid="stCodeBlock"] { 
-        background-color: #7A8450 !important; /* 深橄欖綠底 */
-        border: 1px solid #E9EDC9 !important; /* 淡綠色邊框 */
+    /* 7. 複製訂單框強制淺色底綠字 */
+    [data-testid="stCodeBlock"], [data-testid="stCodeBlock"] > div, pre { 
+        background-color: #F8F9F1 !important; 
+        border: 1px solid #E9EDC9 !important; 
         border-radius: 12px !important; 
     }
-    /* 強制複製框內所有代碼文字為白色，絕對 Legible */
-    [data-testid="stCodeBlock"] code, [data-testid="stCodeBlock"] code *, [data-testid="stCodeBlock"] pre * {
-        color: #FFFFFF !important; 
-        -webkit-text-fill-color: #FFFFFF !important;
+    [data-testid="stCodeBlock"] code, [data-testid="stCodeBlock"] span, [data-testid="stCodeBlock"] * {
+        color: #4A4E31 !important; 
+        -webkit-text-fill-color: #4A4E31 !important;
+        background-color: transparent !important;
         text-shadow: none !important;
-        font-family: 'Noto Sans TC', sans-serif !important;
     }
-    [data-testid="stCodeBlock"] button { opacity: 1 !important; background-color: rgba(233, 237, 201, 1) !important; scale: 0.8; }
+    [data-testid="stCodeBlock"] button { opacity: 1 !important; background-color: #E9EDC9 !important; scale: 0.8; }
 
-    /* 7. 頁尾固定 */
-    .custom-footer { position: fixed; left: 0; bottom: 0; width: 100vw; text-align: center; background-color: rgba(74, 78, 49, 0.9); padding: 8px 0; z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
-    .footer-text { font-size: 0.65rem !important; color: #E9EDC9 !important; margin: 0 !important; }
+    /* 8. 頁尾固定 */
+    .custom-footer { position: fixed; left: 0; bottom: 0; width: 100vw; text-align: center; background-color: #FDFBF7; padding: 8px 0; z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); border-top: 1px solid #E9EDC9; }
+    .footer-text { font-size: 0.65rem !important; color: #8B8B7A !important; -webkit-text-fill-color: #8B8B7A !important; margin: 0 !important; }
     #MainMenu, footer, header { visibility: hidden; }
     </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 第二步：版面配置與商品陳列 (全面折疊版)
+# 第二步：版面配置與商品陳列
 # ==========================================
 img_path = "29301.jpg"
 if os.path.exists(img_path): st.image(img_path)
@@ -175,8 +146,8 @@ with st.expander("點擊展開代餐包品項"):
 # ==========================================
 # 第三步：顧客資訊、溫暖提示與結帳總計
 # ==========================================
-st.markdown("<br><hr style='border: 0.5px solid #E9EDC9; rgba(233, 237, 201, 0.3);'>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align:center; color:#E9EDC9;'>📝 配送資訊與結帳</h4>", unsafe_allow_html=True)
+st.markdown("<br><hr style='border: 0.5px solid #E9EDC9;'>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center; color:#7A8450;'>📝 配送資訊與結帳</h4>", unsafe_allow_html=True)
 
 # 完整顧客資訊欄位
 name = st.text_input("👤 收件人姓名", placeholder="請填寫您的姓名...")
@@ -194,14 +165,14 @@ if total_price > 0:
     
     if missing_fields:
         st.markdown(f"""
-        <div style='background-color:transparent; border-left: 5px solid #E8A87C; padding:12px; border-radius:5px; margin-bottom:15px; border: 1px solid rgba(232, 168, 124, 0.3);'>
-            <p style='color:#E8A87C; font-weight:bold; margin:0; font-size:0.95rem; -webkit-text-fill-color: #E8A87C !important;'>🐢 溫馨小提醒：</p>
-            <p style='color:#FDFBF7; margin:5px 0 0; font-size:0.9rem; -webkit-text-fill-color: #FDFBF7 !important;'>您尚未填寫完整的「<b>{'、'.join(missing_fields)}</b>」，記得補上資訊，米寶才能將溫暖順利送達給您喔！</p>
+        <div style='background-color:#FDF5E6; border-left: 5px solid #E8A87C; padding:12px; border-radius:5px; margin-bottom:15px;'>
+            <p style='color:#C38D5E !important; -webkit-text-fill-color: #C38D5E !important; font-weight:bold; margin:0; font-size:0.95rem;'>🐢 溫馨小提醒：</p>
+            <p style='color:#8B8B7A !important; -webkit-text-fill-color: #8B8B7A !important; margin:5px 0 0; font-size:0.9rem;'>您尚未填寫完整的「<b>{'、'.join(missing_fields)}</b>」，記得補上資訊，米寶才能將溫暖順利送達給您喔！</p>
         </div>
         """, unsafe_allow_html=True)
 
     # 顯眼大字體總金額
-    st.markdown(f'<p style="font-size: 1.5rem; font-weight: 900; color: #FFFFFF; text-align: center; margin: 20px 0; background-color: rgba(122, 132, 80, 0.5); padding: 10px; border-radius: 10px; -webkit-text-fill-color: #FFFFFF !important;">🛒 本次預約總計：${total_price}</p>', unsafe_allow_html=True)
+    st.markdown(f'<p style="font-size: 1.5rem; font-weight: 900; color: #7A8450 !important; -webkit-text-fill-color: #7A8450 !important; text-align: center; margin: 20px 0; background-color: #F1F4E8; padding: 10px; border-radius: 10px;">🛒 本次預約總計：${total_price}</p>', unsafe_allow_html=True)
     
     sub_text = "【✅ 已開啟每月訂閱制固定配送】" if sub_choice else "【單次預約方案】"
     summary_str = "\n".join(order_summary)
@@ -218,5 +189,4 @@ if total_price > 0:
     line_url = "https://line.me/R/ti/p/@716osfvq"
     st.link_button("🌿 前往 LINE@ 貼上訂單並預約配送 ➔", line_url, use_container_width=True)
 
-# 更新頁尾在深色模式下的 LEGIBILITY
-st.markdown("""<div class="custom-footer"><p class="footer-text" style="-webkit-text-fill-color: #E9EDC9 !important;">米寶漢方｜植感日常選物｜© 2026 Mibao Herbal</p></div>""", unsafe_allow_html=True)
+st.markdown("""<div class="custom-footer"><p class="footer-text">米寶漢方｜植感日常選物｜© 2026 Mibao Herbal</p></div>""", unsafe_allow_html=True)
