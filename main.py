@@ -2,7 +2,7 @@ import streamlit as st
 import os
 
 # ==========================================
-# 第一步：環境設定與 CSS 視覺靈魂 (精準修復亂碼與黑底)
+# 第一步：環境設定與 CSS 視覺靈魂 (核彈級防深色模式)
 # ==========================================
 st.set_page_config(page_title="米寶漢方｜植感日常選物", layout="centered")
 
@@ -23,7 +23,7 @@ st.markdown("""
     /* 3. Logo 尺寸 */
     [data-testid="stImage"] img { max-height: 50px !important; width: auto !important; margin: 0 auto !important; display: block; }
     
-    /* 4. 🚀 徹底解決深色模式黑底 (輸入框、加減按鈕、Checkbox黑塊) */
+    /* 4. 🚀 徹底消滅深色模式黑底與黑方塊 */
     div[data-baseweb="input"], div[data-baseweb="base-input"] { 
         background-color: #FFFFFF !important; 
         border: 1.5px solid #E9EDC9 !important; 
@@ -39,8 +39,10 @@ st.markdown("""
         color: #4A4E31 !important;
         border: none !important;
     }
-    [data-testid="stCheckbox"] div[data-baseweb="checkbox"] div {
-        background-color: transparent !important;
+    /* 強制把 Checkbox 旁邊的黑底塗白 */
+    [data-testid="stCheckbox"] label > div:first-child {
+        background-color: #FFFFFF !important;
+        border: 2px solid #7A8450 !important;
     }
 
     /* 5. LINE 原生跳轉按鈕樣式鎖定 */
@@ -50,15 +52,16 @@ st.markdown("""
     }
     [data-testid="stLinkButton"] a * { color: #FFFFFF !important; font-size: 1.05rem !important; font-weight: 900 !important; }
 
-    /* 6. 程式碼複製框防黑底與「隱形字體」修復 */
-    [data-testid="stCodeBlock"], [data-testid="stCodeBlock"] > div, pre, code { 
+    /* 6. 🚀 修復「隱形字」：強制訂單明細框內所有文字為深綠色 */
+    [data-testid="stCodeBlock"] { 
         background-color: #F8F9F1 !important; 
         border: 1px solid #E9EDC9 !important; 
         border-radius: 12px !important; 
     }
-    [data-testid="stCodeBlock"] code span {
+    [data-testid="stCodeBlock"] * {
         color: #4A4E31 !important; 
-        font-weight: bold !important;
+        -webkit-text-fill-color: #4A4E31 !important;
+        text-shadow: none !important;
     }
     [data-testid="stCodeBlock"] button { opacity: 1 !important; background-color: rgba(233, 237, 201, 1) !important; scale: 0.8; }
 
@@ -70,7 +73,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 第二步：版面配置與商品陳列 (經典單行排版)
+# 第二步：版面配置與商品陳列
 # ==========================================
 img_path = "29301.jpg"
 if os.path.exists(img_path): st.image(img_path)
@@ -82,14 +85,15 @@ total_price = 0
 
 # --- 1. 六種漢方茶飲 ---
 st.markdown('<div class="section-title">🍵 漢方植感茶飲系列</div>', unsafe_allow_html=True)
-teas = ["黃耆元氣茶", "金菊牛蒡茶", "當歸紅棗茶", "黑豆漢方茶", "洛神山楂茶", "玫瑰決明茶"]
-for t in teas:
-    qty = st.number_input(f"{t} (10入) $680", min_value=0, step=1, key=t)
-    if qty > 0:
-        order_summary.append(f"• {t}(10入) x {qty}")
-        total_price += 680 * qty
+with st.expander("點擊展開茶飲品項 ($680 / 10入)"):
+    teas = ["黃耆元氣茶", "金菊牛蒡茶", "當歸紅棗茶", "黑豆漢方茶", "洛神山楂茶", "玫瑰決明茶"]
+    for t in teas:
+        qty = st.number_input(f"{t} (10入) $680", min_value=0, step=1, key=t)
+        if qty > 0:
+            order_summary.append(f"• {t}(10入) x {qty}")
+            total_price += 680 * qty
 
-# --- 2. 藥膳燉湯區 (經典折疊選單) ---
+# --- 2. 藥膳燉湯區 ---
 st.markdown('<div class="section-title">🥣 藥膳燉湯包 (需自燉)</div>', unsafe_allow_html=True)
 with st.expander("點擊展開湯包品項 ($150 / $250)"):
     st.markdown("**【 $150/包 系列 】**")
@@ -106,25 +110,31 @@ with st.expander("點擊展開湯包品項 ($150 / $250)"):
             order_summary.append(f"• {s}燉湯包 x {qty}")
             total_price += 250 * qty
 
-# --- 3. 日常真空調理區 (新增八珍) ---
+# --- 3. 日常真空調理區 ---
 st.markdown('<div class="section-title">🛍️ 日常真空調理包</div>', unsafe_allow_html=True)
-for d in ["杜仲茶 (真空包)", "四物茶 (真空包)"]:
-    d_qty = st.number_input(f"{d} $90", min_value=0, step=1, key=d)
-    if d_qty > 0:
-        order_summary.append(f"• {d} x {d_qty}")
-        total_price += 90 * d_qty
+with st.expander("點擊展開調理包品項 ($80 ~ $95)"):
+    d_qty1 = st.number_input("杜仲茶 (真空包) $90", min_value=0, step=1, key="杜仲")
+    if d_qty1 > 0:
+        order_summary.append(f"• 杜仲茶(真空包) x {d_qty1}")
+        total_price += 90 * d_qty1
 
-bz_qty = st.number_input("八珍茶 (真空包) $95", min_value=0, step=1, key="八珍茶")
-if bz_qty > 0:
-    order_summary.append(f"• 八珍茶(真空包) x {bz_qty}")
-    total_price += 95 * bz_qty
+    d_qty2 = st.number_input("四物茶 (真空包) $80", min_value=0, step=1, key="四物")
+    if d_qty2 > 0:
+        order_summary.append(f"• 四物茶(真空包) x {d_qty2}")
+        total_price += 80 * d_qty2
+
+    bz_qty = st.number_input("八珍茶 (真空包) $95", min_value=0, step=1, key="八珍")
+    if bz_qty > 0:
+        order_summary.append(f"• 八珍茶(真空包) x {bz_qty}")
+        total_price += 95 * bz_qty
 
 # --- 4. 漢方代餐 ---
 st.markdown('<div class="section-title">🌾 漢方代餐包</div>', unsafe_allow_html=True)
-m_qty = st.number_input("32味五穀養生餐 $300", min_value=0, step=1)
-if m_qty > 0:
-    order_summary.append(f"• 32味五穀養生餐 x {m_qty}")
-    total_price += 300 * m_qty
+with st.expander("點擊展開代餐包品項 ($300)"):
+    m_qty = st.number_input("32味五穀養生餐 $300", min_value=0, step=1)
+    if m_qty > 0:
+        order_summary.append(f"• 32味五穀養生餐 x {m_qty}")
+        total_price += 300 * m_qty
 
 # ==========================================
 # 第三步：收件地址與結帳總計
