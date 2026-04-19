@@ -105,7 +105,7 @@ st.markdown("""
 img_path = "29301.jpg"
 if os.path.exists(img_path): st.image(img_path)
 else: st.markdown("<h4 style='text-align:center;'>🌿 米寶漢方</h4>", unsafe_allow_html=True)
-st.markdown('<p style="text-align:center; font-style:italic; font-size:0.85rem; color:#8B8B7A; margin-bottom: 25px;">「將這份溫潤，訂製成您的日常習慣。」</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center; font-style:italic; font-size:0.85rem; color:#8B8B7A; margin-bottom: 25px;">「將這份植感，訂製成您的日常習慣。」</p>', unsafe_allow_html=True)
 
 order_summary = []
 total_price = 0
