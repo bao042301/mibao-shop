@@ -152,4 +152,4 @@ if total_price > 0:
     line_url = "https://line.me/R/ti/p/@716osfvq"
     st.link_button("🌿 前往 LINE@ 貼上訂單並預約配送 ➔", line_url, use_container_width=True)
 
-st.markdown("""<div class="custom-footer"><p class="footer-text">米寶漢方｜植感日常選物｜©
+st.markdown("""<div class="custom-footer"><p class="footer-text">米寶漢方｜植感日常選物｜© 2026 Mibao Herbal</p></div>""", unsafe_allow_html=True)
