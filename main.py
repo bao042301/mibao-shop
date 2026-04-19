@@ -8,7 +8,7 @@ st.set_page_config(page_title="米寶漢方｜植感日常選物", layout="cente
 
 st.markdown("""
     <style>
-    /* 1. 安全字體設定 (精準避開系統圖示，終結 _arrow_right 亂碼) */
+    /* 1. 安全字體設定 (精準避開系統圖示) */
     .stApp, header { background-color: #FDFBF7 !important; }
     p, h1, h2, h3, h4, h5, h6, label, li { 
         font-family: 'Noto Sans TC', sans-serif !important; 
@@ -20,7 +20,7 @@ st.markdown("""
     h3 { font-size: 1.15rem !important; font-weight: 700 !important; margin: 20px 0 10px !important; text-align: center !important; color: #7A8450 !important; letter-spacing: 1px; }
     [data-testid="stImage"] img { max-height: 50px !important; width: auto !important; margin: 0 auto !important; display: block; }
     
-    /* 3. 🚀 整合式折疊標題 (把原本的綠底直接給展開選單) */
+    /* 3. 🚀 整合式折疊標題 */
     [data-testid="stExpander"] details { 
         border: none !important; 
         background-color: transparent !important; 
@@ -32,14 +32,12 @@ st.markdown("""
         padding: 12px 15px !important; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
-    /* 展開選單的標題文字放大加粗，取代原本的 Section Title */
     [data-testid="stExpander"] summary p { 
         font-size: 1.1rem !important; 
         font-weight: 900 !important; 
         color: #4A4E31 !important; 
         -webkit-text-fill-color: #4A4E31 !important; 
     }
-    /* 箭頭顏色 */
     [data-testid="stExpander"] summary svg {
         fill: #4A4E31 !important;
         color: #4A4E31 !important;
@@ -77,19 +75,22 @@ st.markdown("""
     }
     [data-testid="stLinkButton"] a p { color: #FFFFFF !important; -webkit-text-fill-color: #FFFFFF !important; font-size: 1.05rem !important; font-weight: 900 !important; margin:0 !important; }
 
-    /* 6. 複製訂單框強制淺色底綠字 */
+    /* 6. 🚀 終極修復：複製訂單框改為「質感深色黑板」，確保任何模式下文字都可見 */
     [data-testid="stCodeBlock"], [data-testid="stCodeBlock"] > div, pre { 
-        background-color: #F8F9F1 !important; 
-        border: 1px solid #E9EDC9 !important; 
+        background-color: #4A4E31 !important; /* 深橄欖綠底 */
+        border: none !important; 
         border-radius: 12px !important; 
     }
-    [data-testid="stCodeBlock"] code, [data-testid="stCodeBlock"] span, [data-testid="stCodeBlock"] * {
-        color: #4A4E31 !important; 
-        -webkit-text-fill-color: #4A4E31 !important;
+    [data-testid="stCodeBlock"] code, [data-testid="stCodeBlock"] span, div[data-testid="stCodeBlock"] * {
+        color: #FDFBF7 !important; /* 亮白色文字 */
+        -webkit-text-fill-color: #FDFBF7 !important;
         background-color: transparent !important;
         text-shadow: none !important;
+        font-family: 'Noto Sans TC', sans-serif !important;
     }
-    [data-testid="stCodeBlock"] button { opacity: 1 !important; background-color: #E9EDC9 !important; scale: 0.8; }
+    /* 複製按鈕樣式 */
+    [data-testid="stCodeBlock"] button { opacity: 1 !important; background-color: #E9EDC9 !important; scale: 0.8; border-radius: 8px !important;}
+    [data-testid="stCodeBlock"] button * { fill: #4A4E31 !important; color: #4A4E31 !important; }
 
     /* 7. 頁尾 */
     .custom-footer { position: fixed; left: 0; bottom: 0; width: 100vw; text-align: center; background-color: #FDFBF7; padding: 8px 0; z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); border-top: 1px solid #E9EDC9; }
@@ -99,7 +100,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 第二步：版面配置與商品陳列 (整合大標題折疊版)
+# 第二步：版面配置與商品陳列
 # ==========================================
 img_path = "29301.jpg"
 if os.path.exists(img_path): st.image(img_path)
@@ -109,14 +110,14 @@ st.markdown('<p style="text-align:center; font-style:italic; font-size:0.85rem; 
 order_summary = []
 total_price = 0
 
-# --- 1. 六種漢方茶飲 ---
-with st.expander("🍵 漢方植感茶飲系列 (10入)"):
+# --- 1. 六種漢方茶飲 (改為 20入 $980) ---
+with st.expander("🍵 漢方植感茶飲系列"):
     teas = ["黃耆元氣茶", "金菊牛蒡茶", "當歸紅棗茶", "黑豆漢方茶", "洛神山楂茶", "玫瑰決明茶"]
     for t in teas:
-        qty = st.number_input(f"{t} $680", min_value=0, step=1, key=t)
+        qty = st.number_input(f"{t} (20入) $980", min_value=0, step=1, key=t)
         if qty > 0:
-            order_summary.append(f"• {t}(10入) x {qty}")
-            total_price += 680 * qty
+            order_summary.append(f"• {t}(20入) x {qty}")
+            total_price += 980 * qty
 
 # --- 2. 藥膳燉湯區 ---
 with st.expander("🥣 藥膳燉湯包 (需自燉)"):
