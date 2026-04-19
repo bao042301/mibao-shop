@@ -20,11 +20,17 @@ st.markdown("""
     /* Logo 尺寸 */
     [data-testid="stImage"] img { max-height: 50px !important; width: auto !important; margin: 0 auto !important; display: block; }
     
-    /* 防黑底：數量輸入框與下拉選單 */
-    [data-testid="stNumberInput"] div[data-baseweb="input"], [data-testid="stTextInput"] div[data-baseweb="input"], [data-testid="stSelectbox"] div[data-baseweb="select"] { 
-        background-color: #FFFFFF !important; border: 1.5px solid #E9EDC9 !important; border-radius: 8px !important; 
+    /* 🚀 徹底解決深色模式黑底問題：強制白底綠字 */
+    div[data-baseweb="input"], div[data-baseweb="base-input"] { 
+        background-color: #FFFFFF !important; 
+        border: 1.5px solid #E9EDC9 !important; 
+        border-radius: 8px !important; 
     }
-    [data-testid="stNumberInput"] input, [data-testid="stTextInput"] input, [data-testid="stSelectbox"] div[data-baseweb="select"] * { color: #4A4E31 !important; }
+    input { 
+        background-color: #FFFFFF !important; 
+        color: #4A4E31 !important; 
+        -webkit-text-fill-color: #4A4E31 !important; 
+    }
 
     /* LINE 原生跳轉按鈕樣式鎖定 */
     [data-testid="stLinkButton"] a {
@@ -55,31 +61,20 @@ st.markdown('<p style="text-align:center; font-style:italic; font-size:0.85rem; 
 order_summary = []
 total_price = 0
 
-# --- 1. 客製化漢方茶區 ---
+# --- 1. 六種漢方茶飲直接選購 ---
 st.markdown('<div class="section-title">🍵 漢方植感茶飲系列</div>', unsafe_allow_html=True)
-tea_type = st.selectbox("選擇茶飲氣質", ["請選擇...", "暖陽系 (晨:黃耆金菊/午:當歸黑豆)", "微風系 (晨:洛神金菊/午:玫瑰黑豆)", "清泉系 (晨:金菊黃耆/午:玫瑰當歸)"])
+teas = ["黃耆元氣茶", "金菊牛蒡茶", "當歸紅棗茶", "黑豆漢方茶", "洛神山楂茶", "玫瑰決明茶"]
 
-if tea_type != "請選擇...":
-    col1, col2 = st.columns(2)
-    with col1:
-        q_new = st.number_input("首購組(40入) $1980", min_value=0, step=1)
-        if q_new > 0:
-            order_summary.append(f"• {tea_type}\n  首購組合 x {q_new}")
-            total_price += 1980 * q_new
-    with col2:
-        q_old = st.number_input("老友組(40入) $1880", min_value=0, step=1)
-        if q_old > 0:
-            order_summary.append(f"• {tea_type}\n  老友組合 x {q_old}")
-            total_price += 1880 * q_old
-            
-    q_exp = st.number_input("輕體驗組(10入) $680", min_value=0, step=1)
-    if q_exp > 0:
-        order_summary.append(f"• {tea_type}\n  輕體驗組 x {q_exp}")
-        total_price += 680 * q_exp
+# 這裡導師先預設為 (10入) $680，您可以隨時修改裡面的文字跟金額
+for t in teas:
+    qty = st.number_input(f"{t} (10入) $680", min_value=0, step=1, key=t)
+    if qty > 0:
+        order_summary.append(f"• {t}(10入) x {qty}")
+        total_price += 680 * qty
 
-# --- 2. 藥膳燉湯區 ---
+# --- 2. 藥膳燉湯區 (修復了亂碼標題) ---
 st.markdown('<div class="section-title">🥣 藥膳燉湯包 (需自燉)</div>', unsafe_allow_html=True)
-with st.expander("點擊展開湯包品項 ($150 / $250)"):
+with st.expander("點擊展開湯包品項"):
     st.markdown("**$150/包 系列**")
     for s in ["獨家 四神藥膳", "獨家 四物藥膳", "秘 羊肉爐藥膳", "秘 胡椒雞藥膳"]:
         qty = st.number_input(f"{s} ($150)", min_value=0, step=1, key=s)
@@ -110,18 +105,24 @@ if m_qty > 0:
     total_price += 300 * m_qty
 
 # ==========================================
-# 第三步：訂閱制與自動結帳總計
+# 第三步：收件地址與結帳總計
 # ==========================================
 st.markdown("<br><hr style='border: 0.5px solid #E9EDC9;'>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align:center; color:#7A8450;'>💎 每月訂閱・定額配送</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center; color:#7A8450;'>📝 配送資訊與結帳</h4>", unsafe_allow_html=True)
+
+# 新增地址輸入框
+address = st.text_input("📍 收件地址", placeholder="請填寫您的收件地址...")
 sub_choice = st.checkbox("✅ 我想加入「米寶健康訂閱制」，每月固定配送以上品項")
 
 if total_price > 0:
-    st.markdown(f'<p style="font-size: 1.45rem; font-weight: bold; color: #7A8450; text-align: center; margin-top: 15px;">🛒 本次預約總計：${total_price}</p>', unsafe_allow_html=True)
+    # 顯眼的大字體總金額
+    st.markdown(f'<p style="font-size: 1.5rem; font-weight: 900; color: #7A8450; text-align: center; margin: 20px 0; background-color: #F1F4E8; padding: 10px; border-radius: 10px;">🛒 本次預約總計：${total_price}</p>', unsafe_allow_html=True)
     
     sub_text = "【✅ 已開啟每月訂閱制固定配送】" if sub_choice else "【單次預約方案】"
     summary_str = "\n".join(order_summary)
-    msg = f"Hi 米寶！🐢✨\n我已完成線上選購囉！\n{sub_text}\n---\n{summary_str}\n---\n💰 總計預約金額：${total_price}\n期待這份草本溫暖。🌿"
+    addr_str = f"📍 收件地址：{address}" if address else "📍 收件地址：(未填寫)"
+    
+    msg = f"Hi 米寶！🐢✨\n我已完成線上選購囉！\n{sub_text}\n---\n{summary_str}\n---\n{addr_str}\n💰 總計預約金額：${total_price}\n期待這份草本溫暖。🌿"
     
     st.code(msg, language=None)
     st.markdown('<p style="font-size:0.9rem; text-align:center; margin-top:10px; margin-bottom:5px;">點擊☆上框右上角☆複製訂單明細：</p>', unsafe_allow_html=True)
@@ -130,4 +131,3 @@ if total_price > 0:
     st.link_button("🌿 前往 LINE@ 貼上訂單並預約配送 ➔", line_url, use_container_width=True)
 
 st.markdown("""<div class="custom-footer"><p class="footer-text">米寶漢方｜植感日常選物｜© 2026 Mibao Herbal</p></div>""", unsafe_allow_html=True)
-
