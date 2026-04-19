@@ -195,7 +195,7 @@ if total_price > 0:
     # 組合顧客資訊
     info_str = f"👤 姓名：{name if name else '(未填寫)'}\n📱 電話：{phone if phone else '(未填寫)'}\n📍 地址：{address if address else '(未填寫)'}"
     
-    msg = f"Hi 米寶！🐢✨\n我已完成線上選購囉！\n{sub_text}\n---\n{summary_str}\n---\n{info_str}\n💰 總計預約金額：${total_price}\n期待這份草本溫暖。🌿"
+    msg = f"Hi 米寶！🐢✨\n我已完成線上選購囉！\n{sub_text}\n---\n{summary_str}\n---\n{info_str}\n💰 總計預約金額：${total_price}\n🌿"
     
     # 複製代碼框
     st.code(msg, language=None)
