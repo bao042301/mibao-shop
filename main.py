@@ -39,7 +39,6 @@ st.markdown("""
         color: #4A4E31 !important;
         border: none !important;
     }
-    /* 強制把 Checkbox 旁邊的黑底塗白 */
     [data-testid="stCheckbox"] label > div:first-child {
         background-color: #FFFFFF !important;
         border: 2px solid #7A8450 !important;
@@ -52,16 +51,17 @@ st.markdown("""
     }
     [data-testid="stLinkButton"] a * { color: #FFFFFF !important; font-size: 1.05rem !important; font-weight: 900 !important; }
 
-    /* 6. 🚀 修復「隱形字」：強制訂單明細框內所有文字為深綠色 */
-    [data-testid="stCodeBlock"] { 
+    /* 6. 🚀 終極修復「黑色複製框」與「隱形字」 */
+    [data-testid="stCodeBlock"], [data-testid="stCodeBlock"] > div, [data-testid="stCodeBlock"] pre { 
         background-color: #F8F9F1 !important; 
-        border: 1px solid #E9EDC9 !important; 
         border-radius: 12px !important; 
     }
-    [data-testid="stCodeBlock"] * {
+    [data-testid="stCodeBlock"] code, [data-testid="stCodeBlock"] span {
         color: #4A4E31 !important; 
         -webkit-text-fill-color: #4A4E31 !important;
+        background-color: transparent !important;
         text-shadow: none !important;
+        font-family: 'Noto Sans TC', sans-serif !important;
     }
     [data-testid="stCodeBlock"] button { opacity: 1 !important; background-color: rgba(233, 237, 201, 1) !important; scale: 0.8; }
 
@@ -73,7 +73,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 第二步：版面配置與商品陳列
+# 第二步：版面配置與商品陳列 (全面折疊版)
 # ==========================================
 img_path = "29301.jpg"
 if os.path.exists(img_path): st.image(img_path)
@@ -85,7 +85,7 @@ total_price = 0
 
 # --- 1. 六種漢方茶飲 ---
 st.markdown('<div class="section-title">🍵 漢方植感茶飲系列</div>', unsafe_allow_html=True)
-with st.expander("點擊展開茶飲品項 ($680 / 10入)"):
+with st.expander("點擊展開茶飲品項"):
     teas = ["黃耆元氣茶", "金菊牛蒡茶", "當歸紅棗茶", "黑豆漢方茶", "洛神山楂茶", "玫瑰決明茶"]
     for t in teas:
         qty = st.number_input(f"{t} (10入) $680", min_value=0, step=1, key=t)
@@ -95,7 +95,7 @@ with st.expander("點擊展開茶飲品項 ($680 / 10入)"):
 
 # --- 2. 藥膳燉湯區 ---
 st.markdown('<div class="section-title">🥣 藥膳燉湯包 (需自燉)</div>', unsafe_allow_html=True)
-with st.expander("點擊展開湯包品項 ($150 / $250)"):
+with st.expander("點擊展開湯包品項"):
     st.markdown("**【 $150/包 系列 】**")
     for s in ["獨家 四神藥膳", "獨家 四物藥膳", "秘 羊肉爐藥膳", "秘 胡椒雞藥膳"]:
         qty = st.number_input(f"{s} ($150)", min_value=0, step=1, key=s)
@@ -112,7 +112,7 @@ with st.expander("點擊展開湯包品項 ($150 / $250)"):
 
 # --- 3. 日常真空調理區 ---
 st.markdown('<div class="section-title">🛍️ 日常真空調理包</div>', unsafe_allow_html=True)
-with st.expander("點擊展開調理包品項 ($80 ~ $95)"):
+with st.expander("點擊展開調理包品項"):
     d_qty1 = st.number_input("杜仲茶 (真空包) $90", min_value=0, step=1, key="杜仲")
     if d_qty1 > 0:
         order_summary.append(f"• 杜仲茶(真空包) x {d_qty1}")
@@ -130,30 +130,52 @@ with st.expander("點擊展開調理包品項 ($80 ~ $95)"):
 
 # --- 4. 漢方代餐 ---
 st.markdown('<div class="section-title">🌾 漢方代餐包</div>', unsafe_allow_html=True)
-with st.expander("點擊展開代餐包品項 ($300)"):
+with st.expander("點擊展開代餐包品項"):
     m_qty = st.number_input("32味五穀養生餐 $300", min_value=0, step=1)
     if m_qty > 0:
         order_summary.append(f"• 32味五穀養生餐 x {m_qty}")
         total_price += 300 * m_qty
 
 # ==========================================
-# 第三步：收件地址與結帳總計
+# 第三步：顧客資訊、溫暖提示與結帳總計
 # ==========================================
 st.markdown("<br><hr style='border: 0.5px solid #E9EDC9;'>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align:center; color:#7A8450;'>📝 配送資訊與結帳</h4>", unsafe_allow_html=True)
 
-address = st.text_input("📍 收件地址", placeholder="請填寫您的收件地址...")
+# 完整顧客資訊欄位
+name = st.text_input("👤 收件人姓名", placeholder="請填寫您的姓名...")
+phone = st.text_input("📱 聯絡電話", placeholder="請填寫您的手機號碼...")
+address = st.text_input("📍 收件地址", placeholder="請填寫您的完整收件地址...")
+
 sub_choice = st.checkbox("✅ 我想加入「米寶健康訂閱制」，每月固定配送以上品項")
 
 if total_price > 0:
+    # 溫馨小提醒邏輯：檢查是否有漏填
+    missing_fields = []
+    if not name: missing_fields.append("姓名")
+    if not phone: missing_fields.append("電話")
+    if not address: missing_fields.append("收件地址")
+    
+    if missing_fields:
+        st.markdown(f"""
+        <div style='background-color:#FDF5E6; border-left: 5px solid #E8A87C; padding:12px; border-radius:5px; margin-bottom:15px;'>
+            <p style='color:#C38D5E; font-weight:bold; margin:0; font-size:0.95rem;'>🐢 溫馨小提醒：</p>
+            <p style='color:#8B8B7A; margin:5px 0 0; font-size:0.9rem;'>您尚未填寫完整的「<b>{'、'.join(missing_fields)}</b>」，記得補上資訊，米寶才能將溫暖順利送達給您喔！</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # 顯眼大字體總金額
     st.markdown(f'<p style="font-size: 1.5rem; font-weight: 900; color: #7A8450; text-align: center; margin: 20px 0; background-color: #F1F4E8; padding: 10px; border-radius: 10px;">🛒 本次預約總計：${total_price}</p>', unsafe_allow_html=True)
     
     sub_text = "【✅ 已開啟每月訂閱制固定配送】" if sub_choice else "【單次預約方案】"
     summary_str = "\n".join(order_summary)
-    addr_str = f"📍 收件地址：{address}" if address else "📍 收件地址：(未填寫)"
     
-    msg = f"Hi 米寶！🐢✨\n我已完成線上選購囉！\n{sub_text}\n---\n{summary_str}\n---\n{addr_str}\n💰 總計預約金額：${total_price}\n期待這份草本溫暖。🌿"
+    # 組合顧客資訊
+    info_str = f"👤 姓名：{name if name else '(未填寫)'}\n📱 電話：{phone if phone else '(未填寫)'}\n📍 地址：{address if address else '(未填寫)'}"
     
+    msg = f"Hi 米寶！🐢✨\n我已完成線上選購囉！\n{sub_text}\n---\n{summary_str}\n---\n{info_str}\n💰 總計預約金額：${total_price}\n期待這份草本溫暖。🌿"
+    
+    # 複製代碼框
     st.code(msg, language=None)
     st.markdown('<p style="font-size:0.9rem; text-align:center; margin-top:10px; margin-bottom:5px;">點擊☆上框右上角☆複製訂單明細：</p>', unsafe_allow_html=True)
     
